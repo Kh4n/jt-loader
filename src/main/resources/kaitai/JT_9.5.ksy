@@ -26,6 +26,72 @@ types:
         pos: header.toc_offset
         type: toc_segment
     enums:
+      variability:
+        0: unknown
+        1: constant
+        2: uniform
+        3: varying
+      semantic_binding:
+        0: unknown
+        1: none
+        2: position
+        3: normal
+        4: binormal
+        5: blend_indices
+        6: blend_weight
+        7: tangent
+        8: point_size
+        10: tex_coord_0
+        11: tex_coord_1
+        12: tex_coord_2
+        13: tex_coord_3
+        14: tex_coord_4
+        15: tex_coord_5
+        16: tex_coord_6
+        17: tex_coord_7
+        20: fog_coordinate
+        21: primary_color_output_input
+        22: secondary_color
+        23: primary_color_na_output
+        24: depth_value
+      direction:
+        0: unknown
+        1: input
+        2: output
+        3: both
+      value_class:
+        0: unknown
+        1: immediate
+        2: semantic
+      param_type:
+        0: unknown
+        1: boolean
+        2: integer
+        3: float
+        4: vec2i
+        5: vec3i
+        6: vec4i
+        7: vec2f
+        8: vec3f
+        9: vec4f
+        10: mat2x2f
+        11: mat3x3f
+        12: mat4x4f
+        13: sampler1d
+        14: sampler2d
+        15: sampler3d
+        16: sampler_rectmap
+        17: sampler_cube_map
+        18: sampler1d_shadow_map
+        19: sampler2d_shadow_map
+      shader_language:
+        0: none
+        2: glsl
+      state_flags:
+        0x01: accumulation_final
+        0x02: accumulation_force
+        0x04: accumulation_ignore
+        0x08: attribute_persistable
       compression_level:
         0: lossless
         10: minimally_lossy
@@ -52,6 +118,9 @@ types:
         18: wireframe_representation
         20: ulp
         24: lwpa
+      compression_algo:
+        1: no_compression
+        2: zlib_compression
       element_type:
         0: unknown
         1: end_of_elements
@@ -65,9 +134,13 @@ types:
         9: range_lod_node_element
         10: switch_node_element
         11: base_shape_node_element
-      compression_algo:
-        1: no_compression
-        2: zlib_compression
+        12: vertex_shape_node_element
+        13: tri_strip_set_shape_node_element
+        14: polyline_set_shape_node_element
+        15: point_set_shape_node_element
+        16: polygon_set_shape_node_element
+        17: null_shape_node_element
+        18: primitive_set_shape_node_element
     types:
       guid:
         seq:
@@ -249,6 +322,13 @@ types:
                   : type_id.a==0x10dd104c and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::range_lod_node_element
                   : type_id.a==0x10dd10f3 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::switch_node_element
                   : type_id.a==0x10dd1059 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::base_shape_node_element
+                  : type_id.a==0x10dd107f and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::vertex_shape_node_element
+                  : type_id.a==0x10dd1077 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::tri_strip_set_shape_node_element
+                  : type_id.a==0x10dd1046 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::polyline_set_shape_node_element
+                  : type_id.a==0x98134716 and type_id.b==0x10 and type_id.c==0x818 and type_id.d==0x19 and type_id.e==0x98 and type_id.f==0x8 and type_id.g==0x0 and type_id.h==0x9 and type_id.i==0x83 and type_id.j==0x5d and type_id.k==0x5a ? element_type::point_set_shape_node_element
+                  : type_id.a==0x10dd1048 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::polygon_set_shape_node_element
+                  : type_id.a==0xd239e7b6 and type_id.b==0xdd77 and type_id.c==0x4289 and type_id.d==0xa0 and type_id.e==0x7d and type_id.f==0xb0 and type_id.g==0xee and type_id.h==0x79 and type_id.i==0xf7 and type_id.j==0x94 and type_id.k==0x94 ? element_type::null_shape_node_element
+                  : type_id.a==0xe40373c1 and type_id.b==0x1ad9 and type_id.c==0x11d3 and type_id.d==0x9d and type_id.e==0xaf and type_id.f==0x0 and type_id.g==0xa0 and type_id.h==0xc9 and type_id.i==0xc7 and type_id.j==0xdd and type_id.k==0xc2 ? element_type::primitive_set_shape_node_element
                   : element_type::unknown
           lsg_segment:
             seq:
@@ -285,6 +365,13 @@ types:
                         element_type::range_lod_node_element: range_lod_node_data
                         element_type::switch_node_element: switch_node_data
                         element_type::base_shape_node_element: base_shape_data
+                        element_type::vertex_shape_node_element: vertex_shape_data
+                        element_type::tri_strip_set_shape_node_element: vertex_shape_data
+                        element_type::polyline_set_shape_node_element: polyline_set_shape_node_data
+                        element_type::point_set_shape_node_element: point_set_shape_node_data
+                        element_type::polygon_set_shape_node_element: vertex_shape_data
+                        element_type::null_shape_node_element: null_shape_node_data
+                        element_type::primitive_set_shape_node_element: primitive_set_shape_node_data
               vertex_count_range:
                 seq:
                   - id: min_count
@@ -303,6 +390,47 @@ types:
                     type: s4
                   - id: max_count
                     type: s4
+              quantization_params:
+                seq:
+                  - id: bits_per_vertex
+                    type: u1
+                  - id: normal_bits_factor
+                    type: u1
+                  - id: bits_per_texture_coord
+                    type: u1
+                  - id: bits_per_color
+                    type: u1
+              primitive_set_quantization_params:
+                seq:
+                  - id: bits_per_vertex
+                    type: u1
+                  - id: bits_per_color
+                    type: u1
+              shader_param:
+                seq:
+                  - id: param_name
+                    type: mb_string
+                  - id: param_type
+                    type: u4
+                    enum: param_type
+                  - id: value_class
+                    type: u4
+                    enum: value_class
+                  - id: direction
+                    type: u4
+                    enum: direction
+                  - id: semantic_binding
+                    type: u4
+                    enum: semantic_binding
+                  - id: variability
+                    type: u4
+                    enum: variability
+                  - id: reserved_field
+                    type: u4
+                  - id: values
+                    type: u4
+                    repeat: expr
+                    repeat-expr: 16
               meta_data_node_data:
                 seq:
                   - id: group
@@ -433,4 +561,94 @@ types:
                     type: s4
                   - id: compression_level_raw
                     type: f4
+              vertex_shape_data:
+                seq:
+                  - id: base
+                    type: base_shape_data
+                  - id: version_number
+                    type: s2
+                  - id: vertex_binding
+                    type: u8
+                  - id: quantization_params
+                    type: quantization_params
+                  - id: vertex_binding2
+                    type: u8
+                    if: version_number != 1
+              polyline_set_shape_node_data:
+                seq:
+                  - id: vertex_shape_data
+                    type: vertex_shape_data
+                  - id: version_number
+                    type: s2
+                  - id: area_factor
+                    type: f4
+                  - id: vertex_bindings
+                    type: u8
+                    if: version_number != 1
+              point_set_shape_node_data:
+                seq:
+                  - id: vertex_shape_data
+                    type: vertex_shape_data
+                  - id: version_number
+                    type: s2
+                  - id: area_factor
+                    type: f4
+                  - id: vertex_bindings
+                    type: u8
+                    if: version_number != 1
+              null_shape_node_data:
+                seq:
+                  - id: base
+                    type: base_shape_data
+                  - id: version_number
+                    type: s2
+              primitive_set_shape_node_data:
+                seq:
+                  - id: base
+                    type: base_shape_data
+                  - id: version_number
+                    type: s2
+                  - id: texture_coord_binding
+                    type: s4
+                  - id: color_binding
+                    type: s4
+                  - id: texture_coord_gen_type
+                    type: s4
+                  - id: version_number_format
+                    type: s2
+                  - id: primitive_set_quantization_params
+                    type: primitive_set_quantization_params
+              base_attribute_data:
+                seq:
+                  - id: version_number
+                    type: s2
+                  - id: state_flags
+                    type: u1
+                    enum: state_flags
+                  - id: field_inhibit_flags
+                    type: u4
+              base_shader_data:
+                seq:
+                  - id: version_number
+                    type: s2
+                  - id: shader_language
+                    type: s4
+                    enum: shader_language
+                  - id: inline_source_flag
+                    type: u4
+                  - id: source_code_loc
+                    type: mb_string
+                    if: inline_source_flag != 1
+                  - id: source_code
+                    type: mb_string
+                    if: inline_source_flag == 1
+                  - id: shader_param_count
+                    type: s4
+                  - id: shader_params
+                    type: shader_param
+                    repeat: expr
+                    repeat-expr: shader_param_count
+
+
+
 #                    continue with adding more lsg elements
