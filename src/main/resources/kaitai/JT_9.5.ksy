@@ -299,6 +299,8 @@ types:
                 enum: compression_algo
           logical_element_header:
             seq:
+              - id: garbage
+                type: mb_string
               - id: element_length
                 type: s4
               - id: type_id
