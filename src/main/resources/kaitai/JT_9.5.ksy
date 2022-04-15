@@ -26,6 +26,18 @@ types:
         pos: header.toc_offset
         type: toc_segment
     enums:
+      blend_factor:
+        0: gl_zero
+        1: gl_one
+        2: gl_dst_color
+        3: gl_src_color
+        4: gl_one_minus_dst_color
+        5: gl_one_minus_src_color
+        6: gl_src_alpha
+        7: gl_one_minus_src_alpha
+        8: gl_dst_alpha
+        9: gl_one_minus_dst_alpha
+        110: gl_src_alpha_saturate
       variability:
         0: unknown
         1: constant
@@ -141,6 +153,8 @@ types:
         16: polygon_set_shape_node_element
         17: null_shape_node_element
         18: primitive_set_shape_node_element
+        19: material_attribute_element
+        20: texture_image_attribute_element
     types:
       guid:
         seq:
@@ -230,6 +244,30 @@ types:
             type: coord_f32
           - id: max_corner
             type: coord_f32
+      mx4_f32:
+        seq:
+          - id: data
+            type: f4
+            repeat: expr
+            repeat-expr: 4
+      plane_f32:
+        seq:
+          - id: data
+            type: f4
+            repeat: expr
+            repeat-expr: 4
+      rgb:
+        seq:
+          - id: data
+            type: f4
+            repeat: expr
+            repeat-expr: 3
+      rgba:
+        seq:
+          - id: data
+            type: f4
+            repeat: expr
+            repeat-expr: 4
       jt_header:
         seq:
           - id: reserved_field
@@ -299,8 +337,6 @@ types:
                 enum: compression_algo
           logical_element_header:
             seq:
-              - id: garbage
-                type: mb_string
               - id: element_length
                 type: s4
               - id: type_id
@@ -331,6 +367,8 @@ types:
                   : type_id.a==0x10dd1048 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::polygon_set_shape_node_element
                   : type_id.a==0xd239e7b6 and type_id.b==0xdd77 and type_id.c==0x4289 and type_id.d==0xa0 and type_id.e==0x7d and type_id.f==0xb0 and type_id.g==0xee and type_id.h==0x79 and type_id.i==0xf7 and type_id.j==0x94 and type_id.k==0x94 ? element_type::null_shape_node_element
                   : type_id.a==0xe40373c1 and type_id.b==0x1ad9 and type_id.c==0x11d3 and type_id.d==0x9d and type_id.e==0xaf and type_id.f==0x0 and type_id.g==0xa0 and type_id.h==0xc9 and type_id.i==0xc7 and type_id.j==0xdd and type_id.k==0xc2 ? element_type::primitive_set_shape_node_element
+                  : type_id.a==0x10dd1030 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::material_attribute_element
+                  : type_id.a==0x10dd1073 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::texture_image_attribute_element
                   : element_type::unknown
           lsg_segment:
             seq:
@@ -368,12 +406,15 @@ types:
                         element_type::switch_node_element: switch_node_data
                         element_type::base_shape_node_element: base_shape_data
                         element_type::vertex_shape_node_element: vertex_shape_data
+                        # TODO: vertex binding from vertex shape LOD (shape LOD segment)
                         element_type::tri_strip_set_shape_node_element: vertex_shape_data
                         element_type::polyline_set_shape_node_element: polyline_set_shape_node_data
                         element_type::point_set_shape_node_element: point_set_shape_node_data
                         element_type::polygon_set_shape_node_element: vertex_shape_data
                         element_type::null_shape_node_element: null_shape_node_data
                         element_type::primitive_set_shape_node_element: primitive_set_shape_node_data
+                        element_type::material_attribute_element: material_attribute_data
+                        element_type::texture_image_attribute_element: texture_image_attribute_data
               vertex_count_range:
                 seq:
                   - id: min_count
@@ -650,7 +691,373 @@ types:
                     type: shader_param
                     repeat: expr
                     repeat-expr: shader_param_count
-
+              material_attribute_data:
+                enums:
+                  version:
+                    1: version_1
+                    2: version_2
+                instances:
+                  blending_flag:
+                    value: data_flags & 0x0010 == 1
+                  override_vertex_colors_flag:
+                    value: data_flags & 0x0020 == 1
+                seq:
+                  - id: base
+                    type: base_attribute_data
+                  - id: version_number
+                    type: s2
+                    enum: version
+                  - id: data_flags
+                    type: b6
+                  - id: source_blend_factor
+                    type: b5
+                    enum: blend_factor
+                  - id: destination_blend_factor
+                    type: b5
+                    enum: blend_factor
+                  - id: ambient_color
+                    type: rgba
+                  - id: diffuse_color_and_alpha
+                    type: rgba
+                  - id: specular_color
+                    type: rgba
+                  - id: emission_color
+                    type: rgba
+                  - id: shininess
+                    type: f4
+                  - id: reflectivity
+                    type: f4
+                    if: version_number == version::version_2
+              texture_coord_gen_params:
+                enums:
+                  tex_coord_gen_mode:
+                    0: none
+                    1: model_coord_system_linear
+                    2: view_coord_system_linear
+                    3: sphere_map
+                    4: reflection_map
+                    5: normal_map
+                seq:
+                  - id: tex_coord_gen_mode
+                    type: s4
+                    enum: tex_coord_gen_mode
+                    repeat: expr
+                    repeat-expr: 4
+                  - id: tex_coord_reference_plane
+                    type: plane_f32
+                    repeat: expr
+                    repeat-expr: 4
+              texture_environment:
+                enums:
+                  internal_compression_level:
+                    0: none
+                    1: conservative
+                    2: moderate
+                    3: aggressive
+                  blend_type:
+                    0: none
+                    1: gl_decal
+                    2: gl_modulate
+                    3: gl_replace
+                    4: gl_blend
+                    5: gl_add
+                    6: gl_combine
+                  wrap_mode:
+                    0: none
+                    1: clamp
+                    2: repeat
+                    3: mirror_repeat
+                    4: clamp_to_edge
+                    5: clamp_to_border
+                  mipmap_min_filter:
+                    0: none
+                    1: nearest
+                    2: linear
+                    3: nearest_in_mipmap
+                    4: linear_in_mipmap
+                    5: nearest_between_mipmaps
+                    6: linear_between_mipmaps
+                  mipmap_mag_filter:
+                    0: none
+                    1: nearest
+                    2: linear
+                  border_mode:
+                    0: no_border
+                    1: constant_border_color
+                    2: explicit
+                seq:
+                  - id: border_mode
+                    type: s4
+                    enum: border_mode
+                  - id: mipmap_mag_filter
+                    type: s4
+                    enum: mipmap_mag_filter
+                  - id: mipmap_min_filter
+                    type: s4
+                    enum: mipmap_min_filter
+                  - id: s_dimen_wrap_mode
+                    type: s4
+                    enum: wrap_mode
+                  - id: t_dimen_wrap_mode
+                    type: s4
+                    enum: wrap_mode
+                  - id: r_dimen_wrap_mode
+                    type: s4
+                    enum: wrap_mode
+                  - id: blend_type
+                    type: u4
+                    enum: blend_type
+                  - id: internal_compression_level
+                    type: s4
+                    enum: internal_compression_level
+                  - id: blend_color
+                    type: rgba
+                  - id: border_color
+                    type: rgba
+                  - id: texture_transform
+                    type: mx4_f32
+              image_format_description:
+                enums:
+                  shared_image_flag:
+                    0: not_shareable
+                    1: shareable
+                  dimensionality:
+                    0: one_d
+                    2: two_d
+                    3: three_d
+                  pixel_data_type:
+                    0: none
+                    1: i8
+                    2: f32
+                    3: u8
+                    4: u8_bits
+                    5: u16
+                    6: i16
+                    7: u32
+                    8: i32
+                    9: f16_ieee_754
+                  pixel_format:
+                    0: no_format
+                    1: rgb
+                    2: rgba
+                    3: lum
+                    4: luma
+                    5: stencil
+                    6: depth
+                    7: red
+                    8: green
+                    9: blue
+                    10: alpha
+                    11: bgr
+                    12: bgra
+                    13: depth_stencil
+                seq:
+                  - id: pixel_format
+                    type: u4
+                    enum: pixel_format
+                  - id: pixel_data_type
+                    type: u4
+                    enum: pixel_data_type
+                  - id: dimensionality
+                    type: s2
+                    enum: dimensionality
+                  - id: row_alignment
+                    type: s2
+                  - id: width
+                    type: s2
+                  - id: height
+                    type: s2
+                  - id: depth
+                    type: s2
+                  - id: number_border_texels
+                    type: s2
+                  - id: shared_image_flag
+                    type: u1
+                    enum: shared_image_flag
+                  - id: mipmaps_count
+                    type: s2
+              inline_texture_image_data:
+                types:
+                  mipmap_data:
+                    seq:
+                      - id: mipmap_image_byte_count
+                        type: s4
+                      - id: mipmap_image_texel_data
+                        type: u1
+                        repeat: expr
+                        repeat-expr: mipmap_image_byte_count
+                seq:
+                  - id: image_format_description
+                    type: image_format_description
+                  - id: total_image_data_size
+                    type: s4
+                  - id: mipmaps
+                    type: mipmap_data
+                    repeat: expr
+                    repeat-expr: image_format_description.mipmaps_count
+              texture_v3_data:
+                enums:
+                  texture_type:
+                    0: none
+                    1: one_dim_post_lit
+                    2: two_dim_post_lit
+                    3: three_dim_post_lit
+                    4: two_dim_3_comp_tangent_space_normal_map
+                    5: cube_post_lit
+                    7: cube_pre_lit
+                    8: one_dim_pre_lit
+                    9: two_dim_pre_lit
+                    10: three_dim_pre_lit
+                    11: cube_env_map
+                    12: one_dim_gloss_map
+                    13: two_dim_gloss_map
+                    14: three_dim_gloss_map
+                    15: cube_gloss_map
+                    16: two_dim_1_comp_bump_map
+                    17: two_dim_3_comp_world_space_normal_map
+                    18: two_dim_sphere_env_map
+                    19: two_dim_latitude_longitude_env_map
+                    20: two_dim_spherical_diffuse_light_map
+                    21: cube_diffuse_light_map
+                    22: two_dim_lat_long_diffuse_light_map
+                    23: two_dim_spherical_specular_light_map
+                    24: cube_specular_light_map
+                    25: two_dim_lat_long_specular_light_map
+                    26: reset_tex_state_except_shadow_light
+                seq:
+                  - id: texture_v2_stub
+                    type: texture_v2_data
+                  - id: texture_type
+                    type: s4
+                    enum: texture_type
+                  - id: texture_environment
+                    type: texture_environment
+                  - id: texture_coord_gen_params
+                    type: texture_coord_gen_params
+                  - id: texture_channel
+                    type: s4
+                  - id: reserved_field
+                    type: u4
+                  - id: inline_image_storage_flag
+                    type: u1
+                  - id: image_count
+                    type: s4
+                  - id: external_storage_name
+                    type: mb_string
+                    if: inline_image_storage_flag == 0
+                    repeat: expr
+                    repeat-expr: image_count
+                  - id: inline_texture_image_data
+                    type: inline_texture_image_data
+                    if: inline_image_storage_flag == 1
+                    repeat: expr
+                    repeat-expr: image_count
+              texture_v2_data:
+                enums:
+                  texture_type:
+                    0: none
+                    1: one_dim_post_lit
+                    2: two_dim_post_lit
+                    3: three_dim_post_lit
+                    4: two_dim_3_comp_tangent_space_normal_map
+                    5: cube_post_lit
+                    7: cube_pre_lit
+                    8: one_dim_pre_lit
+                    9: two_dim_pre_lit
+                    10: three_dim_pre_lit
+                    11: cube_env_map
+                    12: one_dim_gloss_map
+                    13: two_dim_gloss_map
+                    14: three_dim_gloss_map
+                    15: cube_gloss_map
+                    16: two_dim_1_comp_bump_map
+                    17: two_dim_3_comp_world_space_normal_map
+                    18: two_dim_sphere_env_map
+                    19: two_dim_latitude_longitude_env_map
+                    20: two_dim_spherical_diffuse_light_map
+                    21: cube_diffuse_light_map
+                    22: two_dim_lat_long_diffuse_light_map
+                    23: two_dim_spherical_specular_light_map
+                    24: cube_specular_light_map
+                    25: two_dim_lat_long_specular_light_map
+                seq:
+                  - id: texture_v1_stub
+                    type: texture_v1_data
+                  - id: texture_type
+                    type: s4
+                    enum: texture_type
+                  - id: texture_environment
+                    type: texture_environment
+                  - id: texture_coord_gen_params
+                    type: texture_coord_gen_params
+                  - id: texture_channel
+                    type: s4
+                  - id: reserved_field
+                    type: u4
+                  - id: inline_image_storage_flag
+                    type: u1
+                  - id: image_count
+                    type: s4
+                  - id: external_storage_name
+                    type: mb_string
+                    if: inline_image_storage_flag == 0
+                    repeat: expr
+                    repeat-expr: image_count
+                  - id: inline_texture_image_data
+                    type: inline_texture_image_data
+                    if: inline_image_storage_flag == 1
+                    repeat: expr
+                    repeat-expr: image_count
+              texture_v1_data:
+                enums:
+                  texture_type:
+                    0: none
+                    1: one_dimensional
+                    2: two_dimensional
+                    3: three_dimensional
+                    4: bump_map
+                    5: cube_map
+                    6: depth_map
+                seq:
+                  - id: texture_type
+                    type: s4
+                    enum: texture_type
+                  - id: texture_environment
+                    type: texture_environment
+                  - id: texture_coord_gen_params
+                    type: texture_coord_gen_params
+                  - id: texture_channel
+                    type: s4
+                  - id: reserved_field
+                    type: u4
+                  - id: inline_image_storage_flag
+                    type: u1
+                  - id: image_count
+                    type: s4
+                  - id: external_storage_name
+                    type: mb_string
+                    if: inline_image_storage_flag == 0
+                    repeat: expr
+                    repeat-expr: image_count
+                  - id: inline_texture_image_data
+                    type: inline_texture_image_data
+                    if: inline_image_storage_flag == 1
+                    repeat: expr
+                    repeat-expr: image_count
+              texture_image_attribute_data:
+                seq:
+                  - id: base
+                    type: base_attribute_data
+                  - id: version_number
+                    type: s2
+                  - id: texture_v1_data
+                    type: texture_v1_data
+                  - id: texture_v2_data
+                    type: texture_v2_data
+                    if: version_number >= 2
+                  - id: texture_v3_data
+                    type: texture_v3_data
+                    if: version_number >= 3
 
 
 #                    continue with adding more lsg elements
