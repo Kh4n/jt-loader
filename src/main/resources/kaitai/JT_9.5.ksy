@@ -155,6 +155,9 @@ types:
         18: primitive_set_shape_node_element
         19: material_attribute_element
         20: texture_image_attribute_element
+        21: draw_style_attribute_element
+        22: light_set_attribute_element
+        23: infinite_light_attribute_element
     types:
       guid:
         seq:
@@ -369,6 +372,9 @@ types:
                   : type_id.a==0xe40373c1 and type_id.b==0x1ad9 and type_id.c==0x11d3 and type_id.d==0x9d and type_id.e==0xaf and type_id.f==0x0 and type_id.g==0xa0 and type_id.h==0xc9 and type_id.i==0xc7 and type_id.j==0xdd and type_id.k==0xc2 ? element_type::primitive_set_shape_node_element
                   : type_id.a==0x10dd1030 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::material_attribute_element
                   : type_id.a==0x10dd1073 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::texture_image_attribute_element
+                  : type_id.a==0x10dd1014 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::draw_style_attribute_element
+                  : type_id.a==0x10dd1096 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::light_set_attribute_element
+                  : type_id.a==0x10dd1028 and type_id.b==0x2ac8 and type_id.c==0x11d1 and type_id.d==0x9b and type_id.e==0x6b and type_id.f==0x0 and type_id.g==0x80 and type_id.h==0xc7 and type_id.i==0xbb and type_id.j==0x59 and type_id.k==0x97 ? element_type::infinite_light_attribute_element
                   : element_type::unknown
           lsg_segment:
             seq:
@@ -415,6 +421,9 @@ types:
                         element_type::primitive_set_shape_node_element: primitive_set_shape_node_data
                         element_type::material_attribute_element: material_attribute_data
                         element_type::texture_image_attribute_element: texture_image_attribute_data
+                        element_type::draw_style_attribute_element: draw_style_attribute_data
+                        element_type::light_set_attribute_element: light_set_attribute_data
+                        element_type::infinite_light_attribute_element: infinite_light_attribute_data
               vertex_count_range:
                 seq:
                   - id: min_count
@@ -1058,6 +1067,88 @@ types:
                   - id: texture_v3_data
                     type: texture_v3_data
                     if: version_number >= 3
-
+              draw_style_attribute_data:
+                enums:
+                  field_inhibit:
+                    0: two_sided_lighting
+                    1: back_face_culling
+                    2: outlined_polygons
+                    3: lighting_enabled
+                    4: flat_shading_flag
+                    5: separate_specular
+                seq:
+                  - id: base
+                    type: base_attribute_data
+                  - id: version_number
+                    type: s2
+                  - id: back_face_culling
+                    type: b1
+                  - id: two_sided_lighting
+                    type: b1
+                  - id: outline_polygons
+                    type: b1
+                  - id: lighting_enabled
+                    type: b1
+                  - id: flat_shading
+                    type: b1
+                  - id: separate_specular
+                    type: b1
+              light_set_attribute_data:
+                seq:
+                  - id: base
+                    type: base_attribute_data
+                  - id: version_number
+                    type: s2
+                  - id: light_count
+                    type: s4
+                  - id: light_object_id
+                    type: s4
+                    repeat: expr
+                    repeat-expr: light_count
+              base_light_data:
+                enums:
+                  is_shadow_caster:
+                    0: no
+                    1: yes
+                  coord_system:
+                    1: viewpoint
+                    2: model
+                    3: world
+                seq:
+                  - id: version_number
+                    type: s2
+                  - id: ambient_color
+                    type: rgba
+                  - id: diffuse_color
+                    type: rgba
+                  - id: specular_color
+                    type: rgba
+                  - id: brightness
+                    type: f4
+                  - id: coord_system
+                    type: s4
+                    enum: coord_system
+                  - id: shadow_caster_flag
+                    type: u1
+                    enum: is_shadow_caster
+                  - id: shadow_opacity
+                    type: f4
+              shadow_parameters:
+                seq:
+                  - id: non_shadow_alpha_factor
+                    type: f4
+                  - id: shadow_alpha_factor
+                    type: f4
+              infinite_light_attribute_data:
+                seq:
+                  - id: base
+                    type: base_light_data
+                  - id: version_number
+                    type: s2
+                  - id: direction
+                    type: dir_f32
+                  - id: shadow_parameters
+                    type: shadow_parameters
+                    if: version_number == 2
 
 #                    continue with adding more lsg elements
